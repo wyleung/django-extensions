@@ -5,7 +5,7 @@ originally from http://www.djangosnippets.org/snippets/828/ by dnordberg
 
 from django.conf import settings
 from django.core.management.base import CommandError, BaseCommand
-from django.db import connection
+from django.db import connection, close_connection
 import django
 import logging
 from optparse import make_option
@@ -141,6 +141,8 @@ Type 'yes' to continue, or 'no' to cancel: """ % (settings.DATABASE_NAME,))
             if settings.DATABASE_PORT:
                 conn_string += " port=%s" % settings.DATABASE_PORT
 
+            # ensure all previously opened database connections by Django are closed
+            close_connection()
             connection = Database.connect(conn_string)
             connection.set_isolation_level(0) #autocommit false
             cursor = connection.cursor()
